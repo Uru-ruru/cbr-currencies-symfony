@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Command;
+
+use App\Message\GetCurrencyMessage;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+
+#[AsCommand(
+    name: 'app:get-history-rates',
+    description: 'Load history rates from exchange',
+)]
+class GetHistoryRatesCommand extends Command
+{
+    public function __construct(
+        private readonly MessageBusInterface $messageBus,
+        private readonly LoggerInterface $logger,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->addArgument('days', InputArgument::OPTIONAL, 'Num Days', 180);
+    }
+
+    /**
+     * @throws \DateMalformedStringException
+     * @throws ExceptionInterface
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $days = $input->getArgument('days');
+        $count = 0;
+
+        if ($days) {
+            $io->note(sprintf('You passed %s days', $days));
+        }
+
+        $today = new \DateTime();
+        $endDate = new \DateTime()->modify('-'.$days.' days');
+
+        while ($today > $endDate) {
+            $this->messageBus->dispatch(new GetCurrencyMessage($today->modify('-1 day')));
+            $this->logger->info(sprintf('Send message for %s', $today->format('Y-m-d')));
+            ++$count;
+        }
+
+        $io->success(sprintf('Messages add %s to async queue.', $count));
+
+        return Command::SUCCESS;
+    }
+}
