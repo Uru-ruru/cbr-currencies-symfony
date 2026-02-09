@@ -51,7 +51,7 @@ readonly class CurrencyProvider implements CurrencyProviderInterface
     private function getRates($params): CurrencyResult
     {
         $resultRate = $this->currencyRepository->findOneBy($params);
-
+        $dayBeforeResultRate = null;
         $dayBefore = $resultRate?->getDate()?->modify('-1 day');
 
         if ($resultRate && $dayBefore) {

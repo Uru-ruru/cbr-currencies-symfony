@@ -17,7 +17,6 @@ final class RatesController extends AbstractController
     #[Route('/{currency}/{date?}',
         name: 'app_rates_base',
         requirements: ['currency' => '[A-Za-z]{3}', 'date' => '\d{4}-\d{2}-\d{2}'],
-        defaults: ['currency' => 'USD'],
         methods: ['GET']
     )]
     public function index(string $currency, ?string $date = null): JsonResponse
@@ -34,7 +33,6 @@ final class RatesController extends AbstractController
     #[Route('/{currency}/{baseCurrency}/{date?}',
         name: 'app_rates',
         requirements: ['currency' => '[A-Za-z]{3}', 'baseCurrency' => '[A-Za-z]{3}', 'date' => '\d{4}-\d{2}-\d{2}'],
-        defaults: ['currency' => 'USD', 'baseCurrency' => 'RUR'],
         methods: ['GET'],
         priority: 2
     )]

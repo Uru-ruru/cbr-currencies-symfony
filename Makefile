@@ -70,5 +70,5 @@ cw: sf
 consume: c=messenger:consume async -vv
 consume: sf
 
-add: c=app:get-history-rates 3
+add: c=app:get-history-rates
 add: sf
