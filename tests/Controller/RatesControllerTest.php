@@ -9,7 +9,7 @@ final class RatesControllerTest extends WebTestCase
     public function testIndex(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/rates');
+        $client->request('GET', '/EUR');
 
         self::assertResponseIsSuccessful();
     }

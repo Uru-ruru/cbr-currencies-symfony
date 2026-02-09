@@ -44,7 +44,7 @@ test: ## Start tests with phpunit, pass the parameter "c=" to add options to php
 	@$(eval c ?=)
 	@$(DOCKER_COMP) exec -e APP_ENV=test php bin/phpunit $(c)
 
-fixer:
+fixer: ## Run external fixer for all files
 	docker run --rm -v .:/app ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.4 fix --config /app/.php-cs-fixer.dist.php
 
 ## —— Composer 🧙 ————————————0——————————————————————————————————————————————————
@@ -64,11 +64,11 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 cc: c=cache:clear ## Clear the cache
 cc: sf
 
-cw: c=cache:warmup
+cw: c=cache:warmup ## Warmup cache
 cw: sf
 
-consume: c=messenger:consume async -vv
+consume: c=messenger:consume async -vv ## Run consumer
 consume: sf
 
-add: c=app:get-history-rates
+add: c=app:get-history-rates ## Add 180 records to queue
 add: sf

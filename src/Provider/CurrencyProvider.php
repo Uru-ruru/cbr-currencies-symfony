@@ -26,11 +26,11 @@ readonly class CurrencyProvider implements CurrencyProviderInterface
             $baseRates = $this->getRates($toParams);
 
             if (null === $baseRates->getRate() || 0.0 === $baseRates->getRate()) {
-                throw new \InvalidArgumentException('Base currency rate cannot be zero or null');
+                throw new \InvalidArgumentException('No data rate found for current currency');
             }
 
             if (null === $baseRates->getDayBeforeRate() || 0.0 === $baseRates->getDayBeforeRate()) {
-                throw new \InvalidArgumentException('Base currency day-before rate cannot be zero or null');
+                throw new \InvalidArgumentException('No day Before data rate found for current currency');
             }
 
             $rates = new CurrencyResult(

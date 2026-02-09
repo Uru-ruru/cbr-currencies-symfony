@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsCommand(
     name: 'app:get-history-rates',
-    description: 'Load history rates from exchange',
+    description: 'Load history rates from api',
 )]
 class GetHistoryRatesCommand extends Command
 {
