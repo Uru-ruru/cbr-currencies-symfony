@@ -46,12 +46,22 @@ class GetHistoryRatesCommand extends Command
             $io->note(sprintf('You passed %s days', $days));
         }
 
-        $today = new \DateTime();
-        $endDate = new \DateTime()->modify('-'.$days.' days');
+        $today = new \DateTimeImmutable('today');
+        $endDate = $today->modify("-{$days} days");
 
-        while ($today > $endDate) {
-            $this->messageBus->dispatch(new GetCurrencyMessage($today->modify('-1 day')));
-            $this->logger->info(sprintf('Send message for %s', $today->format('Y-m-d')));
+        for (
+            $date = $today;
+            $date > $endDate;
+            $date = $date->modify('-1 day')
+        ) {
+            $this->messageBus->dispatch(new GetCurrencyMessage($date));
+
+            $this->logger->debug(
+                'Message', [
+                    'date' => $date->format('d-m-Y'),
+                ]
+            );
+
             ++$count;
         }
 

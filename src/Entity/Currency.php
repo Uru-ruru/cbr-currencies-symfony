@@ -5,9 +5,10 @@ namespace App\Entity;
 use App\Repository\CurrencyRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Clock\DatePoint;
 
 #[ORM\Entity(repositoryClass: CurrencyRepository::class)]
+#[ORM\UniqueConstraint(name: 'date_num_code_unique', columns: ['date', 'num_code'])]
+#[ORM\UniqueConstraint(name: 'date_char_code_unique', columns: ['date', 'char_code'])]
 class Currency
 {
     #[ORM\Id]
@@ -33,8 +34,8 @@ class Currency
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 4)]
     private ?string $vunitRate = null;
 
-    #[ORM\Column(type: 'date_point')]
-    private ?DatePoint $date = null;
+    #[ORM\Column(type: 'date_immutable')]
+    private ?\DateTimeImmutable $date = null;
 
     public function getId(): ?int
     {
@@ -120,12 +121,12 @@ class Currency
         return $this;
     }
 
-    public function getDate(): ?DatePoint
+    public function getDate(): ?\DateTimeImmutable
     {
         return $this->date;
     }
 
-    public function setDate(DatePoint $date): static
+    public function setDate(\DateTimeImmutable $date): static
     {
         $this->date = $date;
 

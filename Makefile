@@ -47,14 +47,6 @@ test: ## Start tests with phpunit, pass the parameter "c=" to add options to php
 fixer:
 	docker run --rm -v .:/app ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.4 fix --config /app/.php-cs-fixer.dist.php
 
-add_rates:
-	@${SYMFONY} app:get-history-rates 3
-
-run_consumer:
-	@${SYMFONY} messenger:consume -vv
-
-cache_warmup:
-	@${SYMFONY} cache:warmup
 ## —— Composer 🧙 ————————————0——————————————————————————————————————————————————
 composer: ## Run composer, pass the parameter "c=" to run a given command, example: make composer c='req symfony/orm-pack'
 	@$(eval c ?=)
@@ -69,5 +61,14 @@ sf: ## List all Symfony commands or pass the parameter "c=" to run a given comma
 	@$(eval c ?=)
 	@$(SYMFONY) $(c)
 
-cc: c=c:c ## Clear the cache
+cc: c=cache:clear ## Clear the cache
 cc: sf
+
+cw: c=cache:warmup
+cw: sf
+
+consume: c=messenger:consume async -vv
+consume: sf
+
+add: c=app:get-history-rates 3
+add: sf

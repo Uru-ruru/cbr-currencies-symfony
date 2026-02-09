@@ -8,7 +8,7 @@ use Symfony\Component\Messenger\Attribute\AsMessage;
 final readonly class GetCurrencyMessage
 {
     public function __construct(
-        public \DateTime $date,
+        public \DateTimeImmutable $date,
     ) {
     }
 }

@@ -6,7 +6,6 @@ use App\Entity\Currency;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Clock\DatePoint;
 
 /**
  * @extends ServiceEntityRepository<Currency>
@@ -20,41 +19,7 @@ class CurrencyRepository extends ServiceEntityRepository
         parent::__construct($registry, Currency::class);
     }
 
-    //    /**
-    //     * @return Currency[] Returns an array of Currency objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Currency
-    //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-
-    public function findAll(): array
-    {
-        return $this->createQueryBuilder('c')
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(100)
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function add(\DateTime $date, string $numCode, string $charCode, int $nominal, string $name, string $value, string $vunitRate): void
+    public function add(\DateTimeImmutable $date, string $numCode, string $charCode, int $nominal, string $name, string $value, string $vunitRate): void
     {
         try {
             $rate = $this->createCurrency($date, $numCode, $charCode, $nominal, $name, $value, $vunitRate);
@@ -68,13 +33,17 @@ class CurrencyRepository extends ServiceEntityRepository
         }
     }
 
-    /**
-     * @throws \DateMalformedStringException
-     */
-    private function createCurrency(\DateTime $date, string $numCode, string $charCode, int $nominal, string $name, string $value, string $vunitRate): Currency
+    private function createCurrency(\DateTimeImmutable $date, string $numCode, string $charCode, int $nominal, string $name, string $value, string $vunitRate): Currency
     {
+        $rate = $this->findOneBy(['date' => $date, 'numCode' => $numCode]);
+        if ($rate instanceof Currency) {
+            $this->logger->info('Currency already exists');
+
+            return $rate;
+        }
+
         $rate = new Currency();
-        $rate->setDate(new DatePoint($date->format('Y-m-d')))
+        $rate->setDate($date)
             ->setNumCode($numCode)
             ->setCharCode($charCode)
             ->setNominal($nominal)
@@ -88,6 +57,7 @@ class CurrencyRepository extends ServiceEntityRepository
     private function logCurrencySave(Currency $rate): void
     {
         $this->logger->info('Saving currency', [
+            'date' => $rate->getDate()?->format('Y-m-d'),
             'numCode' => $rate->getNumCode(),
             'charCode' => $rate->getCharCode(),
             'nominal' => $rate->getNominal(),
