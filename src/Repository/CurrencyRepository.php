@@ -24,8 +24,6 @@ class CurrencyRepository extends ServiceEntityRepository
         try {
             $rate = $this->createCurrency($date, $numCode, $charCode, $nominal, $name, $value, $vunitRate);
             $this->logCurrencySave($rate);
-            $this->getEntityManager()->persist($rate);
-            $this->getEntityManager()->flush();
         } catch (\Exception $e) {
             $this->logger->error('Error saving currency', [
                 'message' => $e->getMessage(),
@@ -50,6 +48,9 @@ class CurrencyRepository extends ServiceEntityRepository
             ->setName($name)
             ->setValue($value)
             ->setVunitRate($vunitRate);
+
+        $this->getEntityManager()->persist($rate);
+        $this->getEntityManager()->flush();
 
         return $rate;
     }
