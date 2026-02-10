@@ -2,7 +2,7 @@
 
 namespace App\Provider;
 
-readonly class CurrencyResult implements \JsonSerializable
+readonly class CurrencyResult
 {
     public function __construct(
         private ?string $rate = null,
@@ -36,10 +36,5 @@ readonly class CurrencyResult implements \JsonSerializable
     public function getDayBeforeDiff(): ?string
     {
         return $this->dayBeforeDiff;
-    }
-
-    public function jsonSerialize(): array
-    {
-        return get_object_vars($this);
     }
 }
